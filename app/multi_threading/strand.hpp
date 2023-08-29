@@ -22,7 +22,7 @@ namespace multi_threading {
 //  std::set_terminate(myhandler);
 
   template <typename queue_t>
-  struct strand_t {
+  struct strand_t final {
   public:
 	  explicit strand_t (std::size_t q_size = freq::const_values::k_ts_queue_default_size);
 	  ~strand_t();
