@@ -1,3 +1,20 @@
+/**
+ * _________________________________________________________________________
+ * \n\n
+ *
+ * Code was originally placed by K.Vladimirov
+ * While working with this code some of its parts were modified from origin.
+ * \n
+ * _________________________________________________________________________
+ * \n\n
+ * source:
+ * \n
+ * https://sourceforge.net/p/cpp-lects-rus/code/HEAD/tree/trunk/cpp_code/threads/coe_queue.cc#l13
+ * \n\n
+ * _________________________________________________________________________
+ * \n\n
+ */
+
 #pragma once
 
 #include "packaged_task_wrapper.hpp"
@@ -16,7 +33,7 @@ using namespace std::chrono_literals;
 namespace multi_threading {
 
   template<typename T>
-  class ts_coe_queue { //keeping an original from K.Vladimitov
+  class ts_coe_queue { //keeping an original from K.Vladimirov
 
 	  // fixed-size queue
 	  // look it is unaligned...
