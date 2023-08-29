@@ -34,9 +34,9 @@ namespace freq::files {
 	  void write_output(char const *, std::size_t);
 
   private:
+	  filenames_t filenames;
 	  std::ifstream in;
 	  std::ofstream out;
-	  filenames_t filenames;
   };
 }//!namespace
 

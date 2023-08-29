@@ -22,7 +22,7 @@ namespace multi_threading {
 
 	  if constexpr (std::is_same_v<return_type, void>) {
 		  for (auto [b, e] : pages) {
-			  futures.template emplace_back(std::async(callable, b, e, std::forward<Args>(args)...));
+			  futures.template emplace_back(std::async(std::launch::async, callable, b, e, std::forward<Args>(args)...));
 		  }
 		  for (auto &f : futures) {
 			  f.get();
@@ -32,7 +32,7 @@ namespace multi_threading {
 		  std::vector<return_type> result;
 		  result.reserve(pages.size());
 		  for (auto [b, e] : pages) {
-			  futures.template emplace_back(std::async(callable, b, e, std::forward<Args>(args)...));
+			  futures.template emplace_back(std::async(std::launch::async, callable, b, e, std::forward<Args>(args)...));
 		  }
 		  for (auto &f : futures) {
 			  result.emplace_back(f.get());
