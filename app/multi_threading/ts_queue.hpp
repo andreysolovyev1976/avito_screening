@@ -33,7 +33,7 @@ using namespace std::chrono_literals;
 namespace multi_threading {
 
   template<typename T>
-  class ts_coe_queue { //keeping an original from K.Vladimirov
+  class ts_coe_queue { //keeping an original from K.Vladimirov (sounds kinda funny for the Russians)
 
 	  // fixed-size queue
 	  // look it is unaligned...
