@@ -48,7 +48,7 @@ namespace freq {
   template<std::size_t abc_size = const_values::k_default_abc_size>
   struct sharded_trie_t final {
 	  hash_table_t<trie_shard_t<abc_size>, ideal_hash_t<abc_size>> shards;
-	  std::vector<multi_threading::strand_t<multi_threading::ts_queue_t_flex>> strands;
+	  std::vector<multi_threading::strand_t<multi_threading::ts_queue_t>> strands;
 
 	  explicit sharded_trie_t (std::size_t shard_count = abc_size) {
 		  shards.data.reserve(shard_count);

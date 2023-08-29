@@ -4,7 +4,7 @@
 
 #include "../code_branch_selector.h"
 
-#if defined (MT_TRIE) || defined (MT_CONCURRENT_MAP) || defined (ST) && !defined (MT_SHISHKOV)
+#if (defined (MT_TRIE) || defined (MT_CONCURRENT_MAP) || defined (ST)) && !defined (MT_SHISHKOV)
 #include "counter.hpp"
 #elif !defined (MT_TRIE) && !defined (MT_CONCURRENT_MAP) && !defined (ST) && defined (MT_SHISHKOV)
 #include "counter_shishkov.hpp"

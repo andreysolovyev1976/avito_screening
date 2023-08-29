@@ -36,7 +36,7 @@ namespace freq::counter {
 #elif !defined (MT_TRIE) && defined (MT_CONCURRENT_MAP) && !defined (ST)
   auto get_frequencies(iter_t b, iter_t e, multi_threading::ts_map_t<std::string_view, int> &sorted) {
 #elif !defined(MT_TRIE) && !defined(MT_HASH) && defined (ST)
-	  auto get_frequencies(iter_t b, iter_t e, auto &sorted) {
+  auto get_frequencies(iter_t b, iter_t e, auto &sorted) {
 #endif
 
 	  auto l{b}, r{b};

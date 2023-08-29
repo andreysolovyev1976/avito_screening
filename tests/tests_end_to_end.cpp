@@ -10,7 +10,7 @@
 #include <chrono>
 #include <iomanip>
 
-#if defined (MT_TRIE) || defined (MT_CONCURRENT_MAP) || defined (ST) && !defined (MT_SHISHKOV)
+#if (defined (MT_TRIE) || defined (MT_CONCURRENT_MAP) || defined (ST)) && !defined (MT_SHISHKOV)
 #include "../app/counter.hpp"
 #elif !defined (MT_TRIE) && !defined (MT_CONCURRENT_MAP) && !defined (ST) && defined (MT_SHISHKOV)
 #include "../app/counter_shishkov.hpp"
