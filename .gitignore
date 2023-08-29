@@ -1,0 +1,4 @@
+.idea/
+/cmake-build*/
+/build*/
+/test_data/inputs/pg
