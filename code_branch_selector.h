@@ -15,8 +15,8 @@
 
  */
 
-//#define ST
-#define MT_CONCURRENT_MAP
+#define ST
+//#define MT_CONCURRENT_MAP
 //#define MT_TRIE
 	//#define TRIE_ON_VECTOR
 	//#define TRIE_ON_ARENA
