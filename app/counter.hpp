@@ -51,7 +51,7 @@ namespace freq::counter {
 
   constexpr auto get_threads_count = []() -> std::size_t {
 	auto _ = std::thread::hardware_concurrency();
-	return _ == 0 ? const_values::k_default_threads_count : _ * const_values::k_default_page_per_thread;
+	return _ == 0 ? const_values::k_default_threads_count : _ ;
   };
 
   auto get_index(auto& buffer) {

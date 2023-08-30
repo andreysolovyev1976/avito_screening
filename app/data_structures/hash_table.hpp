@@ -37,7 +37,7 @@ namespace freq {
 	  //25 33'554'432
 	  //todo: make it resizable
 	  hash_table_t (std::size_t capacity) : k_size (capacity) {
-		  hash_table.resize(k_size);
+		  hash_table.resize(k_size, {"", 0});
 	  }
 	  Value& operator [] (Key key) {
 		  if (auto found = find(key); found != hash_table.end()) {
