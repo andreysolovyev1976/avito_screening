@@ -44,14 +44,9 @@ namespace freq::counter {
   template<std::forward_iterator iter_t>
   auto process_page(iter_t b, iter_t e) {
 	  auto split = culib::utils::split(std::string_view{b,e}, const_values::k_space);
-	  std::sort(split.begin(), split.end());
-	  std::size_t sz {split.size()};
-	  std::vector<word::stat_t> result;
-	  result.reserve(sz);
-	  result.emplace_back( word::stat_t {split.front(), 1});
-	  for (std::size_t i = 1; i != sz; ++i) {
-		  if (split[i] == result.back().first) ++result.back().second;
-		  else result.emplace_back( word::stat_t {split[i], 1});
+	  std::unordered_map<std::string_view, int> result;
+	  for (std::string_view word : split) {
+		++result[word];
 	  }
 	  return result;
   }
@@ -87,10 +82,30 @@ namespace freq::counter {
 	  run_async(paginated_input, to_abc<iter_t>);
 	  auto interim_results = run_async(paginated_input, process_page<iter_t>);
 
-	  std::vector<word::stat_t> result;
-	  for (auto const& tmp : interim_results) {
-		  result = merge(result, tmp);
+	  while (interim_results.size() > 1) {
+		std::vector<std::future<std::unordered_map<std::string_view, int>>> futures;
+		auto pop_back = [&interim_results] { 
+			auto ret = std::move(interim_results.back()); 
+			interim_results.pop_back();
+			return ret;
+		};
+		while (interim_results.size() > 1) {
+			futures.push_back(std::async([left = pop_back(), right = pop_back()]() mutable {
+				for (auto [w, c] : right) {
+					left[w] += c;
+				}
+				return std::move(left);
+			}));
+		}
+		for (auto& f : futures) {
+			interim_results.push_back(f.get());
+		}
 	  }
+
+	  if (interim_results.size() != 1) {
+		throw std::runtime_error("Error in Shishkov merge");
+	  }
+	  std::vector<word::stat_t> result(interim_results[0].begin(), interim_results[0].end());
 	  std::sort(result.begin(), result.end(), word::stat_greater_t{});
 	  return result;
   }

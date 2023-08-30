@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.22.1)
 set (PROJECT_NAME freq)
 project(${PROJECT_NAME}
         VERSION 0.1

@@ -75,10 +75,10 @@ namespace freq::files {
 	  return {paths};
   }
 
-  processor_t::processor_t(filenames_t &&fnms) : filenames(std::move(fnms)) {
-	  in.open(filenames.input_file, std::ios::in | std::ios::binary);
-	  out.open(filenames.output_file, std::ios::out | std::ios::app | std::ios::binary);
-  }
+  processor_t::processor_t(filenames_t&& fnms)
+      : filenames(std::move(fnms)),
+        in(filenames.input_file),
+        out(filenames.output_file) {}
 
   text::buffer_t processor_t::read_input() {
 	  text::buffer_t buffer(static_cast<size_t>(std::filesystem::file_size(filenames.input_file)), '\0');
