@@ -15,12 +15,12 @@
 
  */
 
-#define ST
+//#define ST
 //#define MT_CONCURRENT_MAP
 //#define MT_TRIE
-	//#define TRIE_ON_VECTOR
+//	#define TRIE_ON_VECTOR
 	//#define TRIE_ON_ARENA
-//#define MT_SHISHKOV
+#define MT_SHISHKOV
 
 
 #endif //FREQ_CODE_BRANCH_SELECTOR_H

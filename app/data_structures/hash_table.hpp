@@ -39,19 +39,18 @@ namespace freq {
 	  hash_table_t (std::size_t capacity) : k_size (capacity) {
 		  hash_table.resize(k_size);
 	  }
+	  Value& operator [] (Key key) {
+		  if (auto found = find(key); found != hash_table.end()) {
+			  found->first = key;
+			  return found->second;
+		  }
+		  else {
+			  throw std::runtime_error("\nhash table is too small to handle what you want\n");
+		  }
+	  }
 	  bool insert(Key key, Value value) & {
 		  if (auto found = find(key); found != hash_table.end()) {
 			  add(found, key, value);
-			  return true;
-		  }
-		  else {
-			  return false;
-		  }
-	  }
-	  bool increment(Key key) & {
-		  if (auto found = find(key); found != hash_table.end()) {
-			  found->first = key;
-			  ++found->second;
 			  return true;
 		  }
 		  else {

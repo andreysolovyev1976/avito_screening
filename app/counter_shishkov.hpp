@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "data_structures/hash_table.hpp"
 #include "multi_threading/async_wrapper.hpp"
 #include "const_values.h"
 #include "word_stat.hpp"
@@ -44,32 +45,12 @@ namespace freq::counter {
   template<std::forward_iterator iter_t>
   auto process_page(iter_t b, iter_t e) {
 	  auto split = culib::utils::split(std::string_view{b,e}, const_values::k_space);
-	  std::unordered_map<std::string_view, int> result;
+	  hash_table_t<std::string_view, int> result (250'000);
 	  for (std::string_view word : split) {
 		++result[word];
 	  }
 	  return result;
   }
-
-  auto merge(auto const& a, auto const& b) {
-	  int L{static_cast<int>(a.size())}, R {static_cast<int>(b.size())};
-	  std::vector<word::stat_t> result;
-	  result.reserve(L + R);
-	  for (int l{0}, r{0}; l < L || r < R; ) {
-		  if (r >= R || (l < L && a[l].first < b[r].first )) {
-			  if (!result.empty() && result.back().first == a[l].first)
-				  result.back().second += a[l++].second;
-			  else result.emplace_back(a[l++]);
-		  }
-		  else {
-			  if (!result.empty() && result.back().first == b[r].first)
-				  result.back().second += b[r++].second;
-			  else result.emplace_back(b[r++]);
-		  }
-	  }
-	  return result;
-  }
-
 
   auto get_index(auto& buffer) {
 	  using iter_t = typename std::decay_t<decltype(buffer)>::iterator;
@@ -83,29 +64,29 @@ namespace freq::counter {
 	  auto interim_results = run_async(paginated_input, process_page<iter_t>);
 
 	  while (interim_results.size() > 1) {
-		std::vector<std::future<std::unordered_map<std::string_view, int>>> futures;
-		auto pop_back = [&interim_results] { 
-			auto ret = std::move(interim_results.back()); 
+		  std::vector<std::future<hash_table_t<std::string_view, int>>> futures;
+		  auto pop_back = [&interim_results] {
+			auto ret = std::move(interim_results.back());
 			interim_results.pop_back();
 			return ret;
-		};
-		while (interim_results.size() > 1) {
-			futures.push_back(std::async([left = pop_back(), right = pop_back()]() mutable {
+		  };
+		  while (interim_results.size() > 1) {
+			  futures.push_back(std::async([left = pop_back(), right = pop_back()]() mutable {
 				for (auto [w, c] : right) {
 					left[w] += c;
 				}
 				return std::move(left);
-			}));
-		}
-		for (auto& f : futures) {
-			interim_results.push_back(f.get());
-		}
+			  }));
+		  }
+		  for (auto& f : futures) {
+			  interim_results.push_back(f.get());
+		  }
 	  }
 
 	  if (interim_results.size() != 1) {
 		throw std::runtime_error("Error in Shishkov merge");
 	  }
-	  std::vector<word::stat_t> result(interim_results[0].begin(), interim_results[0].end());
+	  std::vector<word::stat_t> result(std::move(interim_results[0].release()) );
 	  std::sort(result.begin(), result.end(), word::stat_greater_t{});
 	  return result;
   }
