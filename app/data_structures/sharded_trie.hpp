@@ -54,8 +54,8 @@ namespace freq {
 		  shards.data.reserve(shard_count);
 		  strands.reserve(shard_count);
 		  for (std::size_t i = 0; i != shard_count; ++i) {
-			  shards.data.emplace_back(32'768);
-			  strands.emplace_back(65'536);
+			  shards.data.emplace_back(510'000 / shard_count * 2);  //euristics from pg experience
+			  strands.emplace_back(500'000);						//euristics from pg experience
 		  }
 	  }
 	  std::pair<trie_shard_t<abc_size>*, std::size_t> operator()(char c)& {

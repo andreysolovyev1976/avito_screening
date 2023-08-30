@@ -1,18 +1,19 @@
+//-----------------------------------------------------------------------------
+//
+// Source code for MIPT masters course on C++
+// Slides: https://sourceforge.net/projects/cpp-lects-rus
+// Licensed after GNU GPL v3
+//
+//-----------------------------------------------------------------------------
+
 /**
  * _________________________________________________________________________
  * \n\n
  *
- * Code was originally placed by K.Vladimirov
- * While working with this code some of its parts were modified from origin.
- * \n
+ * Code was originally placed by K.Vladimirov\n
+ * While working with this code some of its parts were modified or removed from origin.\n
  * _________________________________________________________________________
- * \n\n
- * source:
  * \n
- * https://sourceforge.net/p/cpp-lects-rus/code/HEAD/tree/trunk/cpp_code/threads/coe_queue.cc#l13
- * \n\n
- * _________________________________________________________________________
- * \n\n
  */
 
 #pragma once
@@ -24,40 +25,52 @@
 #include <queue>
 #include <optional>
 
-#ifndef FLEX_SIZE_TS_QUEUE_H
-#define FLEX_SIZE_TS_QUEUE_H
+#ifndef CPP_COURSE_TS_QUEUE_H
+#define CPP_COURSE_TS_QUEUE_H
 
 namespace chrono = std::chrono;
 using namespace std::chrono_literals;
 
 namespace multi_threading {
 
-  template<typename T>
-  class ts_coe_queue { //keeping an original from K.Vladimirov (sounds kinda funny for the Russians)
+  template<typename T> class ts_queue {
 
 	  // fixed-size queue
 	  // look it is unaligned...
-	  std::queue<T> Buffer;
+	  std::vector<T> Buffer;
+	  int NCur = -1;
+	  int NRel = 0; // start position
 	  bool Done = false;
 	  mutable std::mutex Mut;
 	  std::condition_variable CondCons, CondProd;
 
 	  // this interface cannot safely be public
-	  bool empty() const { return Buffer.empty(); }
+	  bool full() const { return NCur>=static_cast<int>(Buffer.size()); }
+	  bool empty() const { return NCur<0; }
 	  bool done() const { return Done; }
 
   public:
-	  ts_coe_queue () = default;
+	  ts_queue(std::size_t BufSize)
+			  :Buffer(BufSize)
+	  {
+		  // prevent integer overflow cases
+		  if (BufSize>(1 << 30))
+			  throw std::runtime_error("unsupported buffer size");
+	  }
 
-	  ts_coe_queue (std::size_t) {}
-
-	  ts_coe_queue(ts_coe_queue &&other)
+	  ts_queue(ts_queue &&other)
 			  :Buffer(std::move(other.Buffer))
 	  {}
 
-	  void push(T Data) {
+	  void push(T Data)
+	  {
 		  std::unique_lock<std::mutex> Lk{Mut};
-		  Buffer.push(std::move(Data));
+		  CondProd.wait(Lk, [this] { return !full(); });
+
+		  // exception safety
+		  int NewCur = NCur+1;
+		  Buffer[(NRel+NewCur)%Buffer.size()] = {std::move(Data)};
+		  NCur = NewCur;
 		  Lk.unlock();
 		  CondCons.notify_one();
 	  }
@@ -65,15 +78,17 @@ namespace multi_threading {
 	  T wait_and_pop() {
 		  std::unique_lock<std::mutex> Lk{Mut};
 		  CondCons.wait(Lk, [this] { return !empty() || done(); });
-		  if (empty()) return T{}; //need this for case of empty, but b-a-a-a-a-d....
-		  auto res = std::move(Buffer.front());
-		  Buffer.pop();
+		  if (empty()) return T{};  //need this for case of empty, but b-a-a-a-a-d....
+		  auto res = std::move(Buffer[NRel%Buffer.size()]);
+		  NRel = (NRel+1)%Buffer.size();
+		  NCur -= 1;
 		  Lk.unlock();
 		  CondProd.notify_one();
 		  return res;
 	  }
 
-	  void wake_and_done() {
+	  void wake_and_done()
+	  {
 		  std::unique_lock<std::mutex> Lk{Mut};
 		  Done = true;
 		  Lk.unlock();
@@ -82,22 +97,18 @@ namespace multi_threading {
 
 	  // only for extern use, locks NCur
 	  // we need this to not stop consume too early
-	  bool is_empty_and_done() const {
+	  bool is_empty_and_done() const
+	  {
 		  std::unique_lock<std::mutex> Lk{Mut};
-		  bool res = empty() && Done;
+		  bool res = (NCur<0) && Done;
 		  return res;
-	  }
-
-	  std::size_t size() const {
-		  return Buffer.size();
 	  }
   };
 
 
-  using ts_queue_t = ts_coe_queue<task_t>;
-
+  using ts_queue_t = ts_queue<task_t>;
 
 } //!namespace
 
 
-#endif //FLEX_SIZE_TS_QUEUE_H
+#endif //CPP_COURSE_TS_QUEUE_H
