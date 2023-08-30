@@ -35,7 +35,7 @@ namespace freq::const_values {
   static int const k_default_page_per_thread {8};
 
   //mt
-  static int const k_min_symbols_count_for_multithreading {1}; //arbitrary value
+  static int const k_min_symbols_count_for_multithreading {10'000}; //arbitrary value
   static std::size_t const k_allowance_for_container_own_data {32};
   static std::size_t const k_ts_queue_default_size {1'000};
 }//!namespace

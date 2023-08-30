@@ -17,7 +17,7 @@
 
 namespace multi_threading {
   template<typename Key, typename Value, typename Hash = std::hash<Key>>
-  class ts_map_t {
+  class ts_map_t final {
   public:
 	  using bucket_t = std::unordered_map<Key, Value, Hash>;
 	  using mapped_t = std::pair<Key, Value>;

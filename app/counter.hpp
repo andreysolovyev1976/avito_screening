@@ -26,8 +26,7 @@
 #define FREQ_COUNTER_H
 
 namespace freq::counter {
-
-
+  
   template<std::forward_iterator iter_t,
 		  std::size_t abc_size = const_values::k_default_abc_size>
 
