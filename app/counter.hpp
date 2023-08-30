@@ -77,7 +77,6 @@ namespace freq::counter {
 #if defined (MT_TRIE) && !defined (MT_CONCURRENT_MAP) && !defined (ST)
 	  std::size_t shard_count {threads_count};
 	  sharded_trie_t index_tmp(shard_count);
-	  get_frequencies<iter_t>(buffer.begin(), buffer.end(), index_tmp);
 	  run_async(paginated_input, get_frequencies<iter_t>, std::ref(index_tmp));
 	  index_tmp.shutdown();
 #elif !defined (MT_TRIE) && defined (MT_CONCURRENT_MAP) && !defined (ST)
